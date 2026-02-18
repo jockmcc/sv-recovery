@@ -1,0 +1,125 @@
+// src/features/Home.tsx
+import React, { useState } from 'react';
+import { UserProfile, RoutineItem, CheckIn, JournalEntry, TrafficLightStatus } from '../types';
+import { analyzePatterns } from '../geminiService';
+
+interface HomeProps {
+  user: UserProfile;
+  routine: RoutineItem[];
+  onToggleRoutine: (id: string) => void;
+  onCheckIn: (data: any) => void;
+  checkIns: CheckIn[];
+  journals: JournalEntry[];
+  onUpdateStatus: (status: TrafficLightStatus) => void;
+  celebratingMilestone?: number | null;
+  onCloseCelebration?: () => void;
+  onNavigate: (tab: string) => void;
+}
+
+const Home: React.FC<HomeProps> = ({ user, routine, onToggleRoutine, onUpdateStatus, checkIns, journals }) => {
+  const [insight, setInsight] = useState<{ text: string; action: string } | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handlePatternAnalysis = async () => {
+    setLoading(true);
+    const result = await analyzePatterns(checkIns, journals);
+    setInsight({ text: result.insight, action: result.action });
+    setLoading(false);
+  };
+
+  return (
+    <div className="space-y-6 animate-fade-in">
+      {/* Welcome Header */}
+      <header className="flex justify-between items-end">
+        <div>
+          <h1 className="font-serif text-3xl font-bold text-[#3B7080]">Good Morning, {user.name}</h1>
+          <p className="text-slate-500">Day {user.totalSoberDays} of your journey.</p>
+        </div>
+        <div className="text-right hidden md:block">
+          <div className="text-sm font-bold text-slate-400 uppercase tracking-wider">Current Status</div>
+          <div className={`font-bold ${user.currentStatus === 'green' ? 'text-emerald-500' : 'text-amber-500'}`}>
+            {user.currentStatus.toUpperCase()}
+          </div>
+        </div>
+      </header>
+
+      {/* Traffic Light System */}
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+        <h3 className="font-bold text-slate-700 mb-4">How are you holding up?</h3>
+        <div className="grid grid-cols-3 gap-4">
+          {['green', 'amber', 'red'].map((status) => (
+            <button
+              key={status}
+              onClick={() => onUpdateStatus(status as TrafficLightStatus)}
+              className={`p-4 rounded-xl flex flex-col items-center gap-2 border-2 transition-all ${
+                user.currentStatus === status 
+                  ? 'border-current bg-slate-50 scale-105 shadow-md' 
+                  : 'border-transparent bg-slate-50 opacity-60 hover:opacity-100'
+              } ${
+                status === 'green' ? 'text-emerald-500' : 
+                status === 'amber' ? 'text-amber-500' : 'text-rose-500'
+              }`}
+            >
+              <div className={`w-4 h-4 rounded-full bg-current`} />
+              <span className="font-bold text-sm capitalize">{status}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* AI Insight Card */}
+      <div className="bg-[#3B7080] text-white p-6 rounded-2xl shadow-lg relative overflow-hidden">
+        <div className="relative z-10">
+          <h3 className="font-serif text-xl font-bold mb-2">Daily Pattern Check</h3>
+          <p className="mb-4 opacity-90">
+            {insight ? insight.text : "Let's see how your week is shaping up based on your journals."}
+          </p>
+          
+          {insight && (
+            <div className="bg-white/10 p-4 rounded-xl mb-4 backdrop-blur-sm">
+              <span className="font-bold text-[#88B29C]">💡 Suggestion: </span>
+              {insight.action}
+            </div>
+          )}
+
+          <button 
+            onClick={handlePatternAnalysis}
+            disabled={loading}
+            className="bg-white text-[#3B7080] px-6 py-2 rounded-full font-bold text-sm hover:bg-slate-100 transition-colors"
+          >
+            {loading ? 'Analyzing...' : insight ? 'Check Again' : 'Analyze Patterns'}
+          </button>
+        </div>
+        {/* Decorative background circle */}
+        <div className="absolute -right-10 -bottom-20 w-64 h-64 bg-[#88B29C] rounded-full opacity-20 blur-3xl" />
+      </div>
+
+      {/* Quick Routine Checklist */}
+      <div>
+        <h3 className="font-serif text-xl font-bold text-slate-700 mb-4">Today's Anchors</h3>
+        <div className="space-y-3">
+          {routine.slice(0, 3).map((item) => (
+            <button
+              key={item.id}
+              onClick={() => onToggleRoutine(item.id)}
+              className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
+                item.completed 
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-700' 
+                  : 'bg-white border-slate-100 text-slate-600 hover:border-slate-300'
+              }`}
+            >
+              <span className={item.completed ? 'line-through opacity-70' : ''}>{item.name}</span>
+              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                item.completed ? 'border-emerald-500 bg-emerald-500' : 'border-slate-300'
+              }`}>
+                {item.completed && <span className="text-white text-xs">✓</span>}
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Home;

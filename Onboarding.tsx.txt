@@ -1,0 +1,96 @@
+// src/features/Onboarding.tsx
+import React, { useState } from 'react';
+import { UserRole } from '../types';
+
+interface OnboardingProps {
+  onComplete: (role: UserRole, name: string) => void;
+}
+
+const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
+  const [step, setStep] = useState(1);
+  const [name, setName] = useState('');
+  const [role, setRole] = useState<UserRole | null>(null);
+
+  const handleNext = () => {
+    if (step === 3 && role && name) {
+      onComplete(role, name);
+    } else {
+      setStep(prev => prev + 1);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#3B7080] flex items-center justify-center p-6">
+      <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl animate-fade-in">
+        {step === 1 && (
+          <div className="text-center space-y-6">
+            <div className="text-6xl mb-4">🌿</div>
+            <h1 className="font-serif text-3xl font-bold text-[#3B7080]">Welcome to Safe Harbor</h1>
+            <p className="text-slate-600">A private, secure space for your recovery journey.</p>
+            <button 
+              onClick={handleNext}
+              className="w-full bg-[#3B7080] text-white py-4 rounded-xl font-bold hover:bg-[#2A5260] transition-colors"
+            >
+              Begin Journey
+            </button>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className="space-y-6">
+            <h2 className="font-serif text-2xl font-bold text-[#3B7080]">How do you identify?</h2>
+            <div className="grid gap-4">
+              <button 
+                onClick={() => setRole(UserRole.ADDICTION)}
+                className={`p-6 border-2 rounded-xl text-left transition-all ${role === UserRole.ADDICTION ? 'border-[#3B7080] bg-[#3B7080]/10' : 'border-slate-200 hover:border-[#3B7080]'}`}
+              >
+                <div className="text-2xl mb-2">🛡️</div>
+                <div className="font-bold">I am in recovery</div>
+                <div className="text-sm text-slate-500">I want to build resilience and track my sobriety.</div>
+              </button>
+              
+              <button 
+                onClick={() => setRole(UserRole.FAMILY_FRIEND)}
+                className={`p-6 border-2 rounded-xl text-left transition-all ${role === UserRole.FAMILY_FRIEND ? 'border-[#3B7080] bg-[#3B7080]/10' : 'border-slate-200 hover:border-[#3B7080]'}`}
+              >
+                <div className="text-2xl mb-2">🤝</div>
+                <div className="font-bold">I am a supporter</div>
+                <div className="text-sm text-slate-500">I want to help a loved one without losing myself.</div>
+              </button>
+            </div>
+            <button 
+              disabled={!role}
+              onClick={handleNext}
+              className="w-full bg-[#3B7080] disabled:bg-slate-300 text-white py-4 rounded-xl font-bold mt-4"
+            >
+              Continue
+            </button>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="space-y-6">
+            <h2 className="font-serif text-2xl font-bold text-[#3B7080]">What should we call you?</h2>
+            <p className="text-slate-500 text-sm">This is stored only on your device.</p>
+            <input 
+              type="text" 
+              placeholder="Your Name or Alias"
+              className="w-full p-4 border-2 border-slate-200 rounded-xl text-lg focus:border-[#3B7080] focus:outline-none"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <button 
+              disabled={!name.trim()}
+              onClick={handleNext}
+              className="w-full bg-[#3B7080] disabled:bg-slate-300 text-white py-4 rounded-xl font-bold"
+            >
+              Enter Sanctuary
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Onboarding;

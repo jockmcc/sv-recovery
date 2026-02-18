@@ -1,0 +1,4 @@
+import React from 'react';
+export default function Routine({ routine }: any) {
+  return <div className="p-4"><h1>Daily Routine</h1><p>Full checklist view coming here.</p></div>;
+}

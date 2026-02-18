@@ -1,0 +1,4 @@
+import React from 'react';
+export default function Companion({ user }: any) {
+  return <div className="p-4"><h1>AI Companion</h1><p>Deep conversation mode coming here.</p></div>;
+}

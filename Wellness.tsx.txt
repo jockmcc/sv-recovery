@@ -1,0 +1,4 @@
+import React from 'react';
+export default function Wellness({ user }: any) {
+  return <div className="p-4"><h1>Wellness Hub</h1><p>Journaling and meditation tools coming here.</p></div>;
+}

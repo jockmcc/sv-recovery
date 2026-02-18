@@ -1,0 +1,4 @@
+import React from 'react';
+export default function Places({ user }: any) {
+  return <div className="p-4"><h1>Safe Places</h1><p>Map and resource finder coming here.</p></div>;
+}
