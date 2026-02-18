@@ -1,0 +1,9 @@
+{
+  "name": "Silent Voices Recover",
+  "description": "A compassionate companion for addiction support and recovery. Silent Voices Recover provides daily structure, community connection, and tools for resilience for individuals and their families.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}
